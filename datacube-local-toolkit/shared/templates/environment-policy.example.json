@@ -1,0 +1,17 @@
+{
+  "mode": "local-only",
+  "allowed": {
+    "readProjectFiles": true,
+    "writeProjectFiles": true,
+    "runLocalCommands": true
+  },
+  "prohibited": {
+    "network": true,
+    "webBrowsing": true,
+    "mcp": true,
+    "packageInstallation": true,
+    "credentialUse": true
+  },
+  "connectedChecksDefault": "NOT RUN",
+  "evidenceStates": ["PASS", "FAIL", "NOT RUN", "BLOCKED"]
+}

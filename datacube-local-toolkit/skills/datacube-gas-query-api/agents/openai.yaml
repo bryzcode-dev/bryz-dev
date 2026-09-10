@@ -1,0 +1,3 @@
+interface:
+  display_name: "DataCube GAS Query API"
+  short_description: "Design a bounded offline-tested GAS query facade"

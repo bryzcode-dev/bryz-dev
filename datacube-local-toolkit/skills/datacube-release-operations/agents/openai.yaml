@@ -1,0 +1,4 @@
+interface:
+  display_name: "DataCube Release Operations"
+  short_description: "Gate and hand off an offline-tested cube release"
+  default_prompt: "Use $datacube-release-operations to validate this local release package, preserve rollback, and separate local evidence from connected checks."

@@ -1,0 +1,3 @@
+interface:
+  display_name: "DataCube Design Contract"
+  short_description: "Define and validate an offline DataCube contract"

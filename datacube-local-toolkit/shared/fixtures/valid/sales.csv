@@ -1,0 +1,4 @@
+order_id,region,product,sales,order_date
+1001,West,Widget,10.50,2026-09-01
+1002,East,"Widget, Large",25.00,2026-09-02
+1003,West,Gadget,7.25,2026-09-02

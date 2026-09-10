@@ -1,0 +1,14 @@
+{
+  "releaseVersion": "1.0.0",
+  "cubeVersion": "latest",
+  "contractVersion": "1.0.0",
+  "rollback": {
+    "cubeVersion": "",
+    "target": "",
+    "testedLocally": false
+  },
+  "checks": [
+    {"id":"contract-validation","required":true,"environment":"local","status":"FAIL","evidence":{"origin":"local-test","artifact":"evidence/contract-validation.json"}},
+    {"id":"bigquery-dry-run","required":true,"environment":"connected","status":"PASS","evidence":{"origin":"local-test"}}
+  ]
+}

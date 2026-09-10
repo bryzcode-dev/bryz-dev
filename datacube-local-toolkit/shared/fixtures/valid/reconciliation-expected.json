@@ -1,0 +1,8 @@
+{
+  "cubeVersion": "sales-20260910-001",
+  "metrics": {
+    "order_count": {"value": 3},
+    "total_sales": {"value": 42, "absoluteTolerance": 0.01},
+    "conversion_rate": {"value": 0.25, "relativeTolerance": 0.02}
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "contractVersion": "1.0.0",
+  "cube": { "name": "broken-cube" },
+  "sources": [],
+  "fields": [{ "name": "id", "type": "STRING", "nullable": false }],
+  "keys": { "primary": ["missing_id"], "deduplication": [] },
+  "dimensions": [],
+  "measures": [{ "name": "bad", "field": "missing", "aggregation": "MAGIC" }],
+  "qualityRules": [],
+  "freshness": { "maximumAgeMinutes": 0 }
+}

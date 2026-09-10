@@ -1,0 +1,20 @@
+{
+  "releaseVersion": "1.0.0",
+  "cubeVersion": "sales-20260910-001",
+  "contractVersion": "1.0.0",
+  "rollback": {
+    "cubeVersion": "sales-20260909-001",
+    "target": "analytics.sales_cube_v20260909_001",
+    "testedLocally": true
+  },
+  "checks": [
+    {"id":"contract-validation","required":true,"environment":"local","status":"PASS","evidence":{"origin":"local-test","artifact":"evidence/contract-validation.json"}},
+    {"id":"fixture-reconciliation","required":true,"environment":"local","status":"PASS","evidence":{"origin":"local-test","artifact":"evidence/fixture-reconciliation.json"}},
+    {"id":"idempotency-simulation","required":true,"environment":"local","status":"PASS","evidence":{"origin":"local-test","artifact":"evidence/idempotency-simulation.json"}},
+    {"id":"api-contract","required":true,"environment":"local","status":"PASS","evidence":{"origin":"local-test","artifact":"evidence/api-contract.json"}},
+    {"id":"secret-scan","required":true,"environment":"local","status":"PASS","evidence":{"origin":"local-test","artifact":"evidence/secret-scan.json"}},
+    {"id":"rollback-manifest","required":true,"environment":"local","status":"PASS","evidence":{"origin":"local-test","artifact":"evidence/rollback-manifest.json"}},
+    {"id":"bigquery-dry-run","required":true,"environment":"connected","status":"NOT RUN","evidence":{"origin":"offline-environment"}},
+    {"id":"gas-deployment-smoke-test","required":true,"environment":"connected","status":"NOT RUN","evidence":{"origin":"offline-environment"}}
+  ]
+}

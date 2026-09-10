@@ -1,0 +1,15 @@
+{
+  "contractVersion": "1.0.0",
+  "cube": { "name": "sales-cube", "grain": "one row per order line" },
+  "sources": [{ "id": "sales-csv", "kind": "drive-csv", "localSample": "sales.csv" }],
+  "fields": [
+    { "name": "order_id", "type": "STRING", "nullable": false },
+    { "name": "region", "type": "STRING", "nullable": false },
+    { "name": "sales", "type": "NUMERIC", "nullable": false }
+  ],
+  "keys": { "primary": ["order_id"], "deduplication": ["order_id"] },
+  "dimensions": [{ "name": "region", "field": "region" }],
+  "measures": [{ "name": "total_sales", "field": "sales", "aggregation": "SUM" }],
+  "qualityRules": [{ "id": "sales-nonnegative", "expression": "sales >= 0", "severity": "ERROR" }],
+  "freshness": { "maximumAgeMinutes": 60 }
+}

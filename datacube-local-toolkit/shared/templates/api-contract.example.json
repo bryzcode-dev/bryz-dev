@@ -1,0 +1,26 @@
+{
+  "contractVersion": "1.0.0",
+  "apiVersion": "v1",
+  "cube": "sales-cube",
+  "request": {
+    "allowedDimensions": ["order_date", "region", "product"],
+    "allowedMeasures": ["total_sales"],
+    "allowedFilterOperators": ["EQ", "IN", "BETWEEN"],
+    "partitionField": "order_date",
+    "limits": {
+      "maximumRows": 5000,
+      "maximumDateRangeDays": 366,
+      "maximumBytesBilled": 1073741824,
+      "timeoutMilliseconds": 25000
+    }
+  },
+  "response": {
+    "requiredFields": ["apiVersion", "cubeVersion", "data", "meta", "errors"],
+    "metaFields": ["rowCount", "cacheHit", "bytesProcessed", "executionMilliseconds"],
+    "maximumSerializedBytes": 5000000
+  },
+  "cache": {
+    "ttlSeconds": 900,
+    "keyFields": ["apiVersion", "cubeVersion", "authorizationScope", "dimensions", "measures", "filters", "dateRange", "sort", "page"]
+  }
+}
