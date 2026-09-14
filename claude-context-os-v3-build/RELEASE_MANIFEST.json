@@ -1,0 +1,58 @@
+{
+  "name": "Claude Context OS V3",
+  "version": "3.0.1",
+  "runtime_web_dependencies": false,
+  "authoritative_formats": [
+    "Markdown",
+    "JSON"
+  ],
+  "derived_index": "SQLite + FTS5",
+  "executive_assistant": {
+    "skill": "/ea",
+    "manual_only": true,
+    "forked_context": true,
+    "background": true,
+    "agent": "context-executive-assistant",
+    "write_tools": false
+  },
+  "storage": {
+    "root_configurable": true,
+    "network_mount_supported": true,
+    "local_runtime_supported": true,
+    "shared_nas_topology": "shared-nas-v1",
+    "shared_only_atomic_activation": true,
+    "machine_roots_excluded_from_shared_transaction": true,
+    "path_scoped_machine_enrollment": true
+  },
+  "tests": {
+    "count": 78,
+    "result": "pass"
+  },
+  "real_nas_activation_performed": true,
+  "real_nas_activation": {
+    "migration_id": "20260912T232256Z-55edcba7",
+    "primary_machine": "mac-mini-m4",
+    "shared_root": "/Volumes/BryzConfig/Claude/shared",
+    "runtime_root": "~/Library/Application Support/ClaudeContextOS/home",
+    "activated_at": "2026-09-12T23:43:50.928780+00:00",
+    "health": "pass",
+    "enrollment": "pass",
+    "rollback_root_retained": true
+  },
+  "fixes": [
+    "live-root snapshot boundary verification",
+    "NAS symlink-preserving snapshot copy",
+    "transient live-root copy and inventory retry",
+    "frozen-manifest stage verification",
+    "backup drift diagnostics",
+    "shared-only NAS staging and guarded activation",
+    "portable per-machine runtime and hook paths",
+    "transactional Mac Mini facade enrollment and rollback",
+    "exact-workspace enforcement for shared follow-up commands",
+    "exclusive activation transaction lock",
+    "prepared-stage content verification before atomic swap",
+    "incomplete-active-root rollback recovery",
+    "portable EA snapshot path independent of CONTEXT_OS_HOME",
+    "statically analyzable shared-topology EA permission command"
+  ]
+}

@@ -1,0 +1,6 @@
+{"at": "2026-09-12T22:15:37.678079+00:00", "event_type": "tool.pre", "payload": {"tool": "Bash"}}
+{"at": "2026-09-12T22:15:39.053651+00:00", "event_type": "policy.denied", "payload": {"reason": "Protected/destructive command blocked by Context OS policy.", "tool": "Bash"}}
+{"at": "2026-09-12T22:15:40.459218+00:00", "event_type": "session.started", "payload": {"cwd": "/tmp/tmp0yg8bcgd", "session_id": null}}
+{"at": "2026-09-12T22:16:09.079775+00:00", "event_type": "tool.pre", "payload": {"tool": "Bash"}}
+{"at": "2026-09-12T22:16:10.438127+00:00", "event_type": "policy.denied", "payload": {"reason": "Protected/destructive command blocked by Context OS policy.", "tool": "Bash"}}
+{"at": "2026-09-12T22:16:11.829921+00:00", "event_type": "session.started", "payload": {"cwd": "/tmp/tmpdlwkwfky", "session_id": null}}

@@ -1,0 +1,16 @@
+{
+  "required": {
+    "python": "Python 3 standard library",
+    "sqlite": "SQLite with FTS5 when available",
+    "network_runtime_dependency": false
+  },
+  "optional_local_only": {
+    "gitleaks": "Recursive secret scanning",
+    "opa": "Local policy evaluation",
+    "ast-grep": "Syntax-aware code navigation",
+    "serena": "Optional local semantic code tooling",
+    "restic": "Encrypted local/NAS snapshot repository",
+    "basic-memory": "Optional local semantic memory index; authoritative files remain Context OS files"
+  },
+  "rule": "Optional components must be preinstalled or bundled locally. Context OS must never download them at runtime."
+}

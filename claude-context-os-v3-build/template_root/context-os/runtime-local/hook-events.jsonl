@@ -1,0 +1,39 @@
+{"at": "2026-09-12T22:18:11.603527+00:00", "event_type": "tool.pre", "payload": {"tool": "Bash"}}
+{"at": "2026-09-12T22:18:12.940666+00:00", "event_type": "policy.denied", "payload": {"reason": "Protected/destructive command blocked by Context OS policy.", "tool": "Bash"}}
+{"at": "2026-09-12T22:18:14.274267+00:00", "event_type": "session.started", "payload": {"cwd": "/tmp/tmp4e5xvz98", "session_id": null}}
+{"at": "2026-09-12T22:18:30.828212+00:00", "event_type": "tool.pre", "payload": {"tool": "Bash"}}
+{"at": "2026-09-12T22:18:32.147610+00:00", "event_type": "policy.denied", "payload": {"reason": "Protected/destructive command blocked by Context OS policy.", "tool": "Bash"}}
+{"at": "2026-09-12T22:18:33.524160+00:00", "event_type": "session.started", "payload": {"cwd": "/tmp/tmpxkl8li7b", "session_id": null}}
+{"at": "2026-09-12T22:18:57.182311+00:00", "event_type": "tool.pre", "payload": {"tool": "Bash"}}
+{"at": "2026-09-12T22:18:58.671969+00:00", "event_type": "policy.denied", "payload": {"reason": "Protected/destructive command blocked by Context OS policy.", "tool": "Bash"}}
+{"at": "2026-09-12T22:19:00.056458+00:00", "event_type": "session.started", "payload": {"cwd": "/tmp/tmp_l1452f5", "session_id": null}}
+{"at": "2026-09-12T22:20:53.048481+00:00", "event_type": "tool.pre", "payload": {"tool": "Bash"}}
+{"at": "2026-09-12T22:20:54.389087+00:00", "event_type": "policy.denied", "payload": {"reason": "Protected/destructive command blocked by Context OS policy.", "tool": "Bash"}}
+{"at": "2026-09-12T22:20:55.756227+00:00", "event_type": "session.started", "payload": {"cwd": "/tmp/tmpycf2qp32", "session_id": null}}
+{"at": "2026-09-12T22:23:41.116487+00:00", "event_type": "tool.pre", "payload": {"tool": "Bash"}}
+{"at": "2026-09-12T22:23:42.506270+00:00", "event_type": "policy.denied", "payload": {"reason": "Protected/destructive command blocked by Context OS policy.", "tool": "Bash"}}
+{"at": "2026-09-12T22:23:43.836744+00:00", "event_type": "session.started", "payload": {"cwd": "/tmp/tmp7m5ch2s4", "session_id": null}}
+{"at": "2026-09-12T22:24:49.035308+00:00", "event_type": "tool.pre", "payload": {"tool": "Bash"}}
+{"at": "2026-09-12T22:24:50.398841+00:00", "event_type": "policy.denied", "payload": {"reason": "Protected/destructive command blocked by Context OS policy.", "tool": "Bash"}}
+{"at": "2026-09-12T22:24:51.784661+00:00", "event_type": "session.started", "payload": {"cwd": "/tmp/tmppxfjnbp5", "session_id": null}}
+{"at": "2026-09-12T22:25:54.743469+00:00", "event_type": "tool.pre", "payload": {"tool": "Bash"}}
+{"at": "2026-09-12T22:25:56.097219+00:00", "event_type": "policy.denied", "payload": {"reason": "Protected/destructive command blocked by Context OS policy.", "tool": "Bash"}}
+{"at": "2026-09-12T22:25:57.510954+00:00", "event_type": "session.started", "payload": {"cwd": "/tmp/tmpj2eyzwou", "session_id": null}}
+{"at": "2026-09-12T22:38:14.267042+00:00", "event_type": "tool.pre", "payload": {"tool": "Bash"}}
+{"at": "2026-09-12T22:38:15.545156+00:00", "event_type": "policy.denied", "payload": {"reason": "Protected/destructive command blocked by Context OS policy.", "tool": "Bash"}}
+{"at": "2026-09-12T22:38:16.843848+00:00", "event_type": "session.started", "payload": {"cwd": "/tmp/tmpk7s88lkv", "session_id": null}}
+{"at": "2026-09-12T22:38:50.522940+00:00", "event_type": "tool.pre", "payload": {"tool": "Bash"}}
+{"at": "2026-09-12T22:38:51.822283+00:00", "event_type": "policy.denied", "payload": {"reason": "Protected/destructive command blocked by Context OS policy.", "tool": "Bash"}}
+{"at": "2026-09-12T22:38:53.137123+00:00", "event_type": "session.started", "payload": {"cwd": "/tmp/tmpugwwpdeo", "session_id": null}}
+{"at": "2026-09-12T22:45:49.290845+00:00", "event_type": "tool.pre", "payload": {"tool": "Bash"}}
+{"at": "2026-09-12T22:45:49.319558+00:00", "event_type": "policy.denied", "payload": {"reason": "Protected/destructive command blocked by Context OS policy.", "tool": "Bash"}}
+{"at": "2026-09-12T22:45:49.347500+00:00", "event_type": "session.started", "payload": {"cwd": "/private/var/folders/3w/12kjnrfj441cw5csknpcw7hh0000gn/T/tmpbxaycaqa", "session_id": null}}
+{"at": "2026-09-12T22:46:48.424297+00:00", "event_type": "tool.pre", "payload": {"tool": "Bash"}}
+{"at": "2026-09-12T22:46:48.480308+00:00", "event_type": "policy.denied", "payload": {"reason": "Protected/destructive command blocked by Context OS policy.", "tool": "Bash"}}
+{"at": "2026-09-12T22:46:48.511078+00:00", "event_type": "session.started", "payload": {"cwd": "/private/var/folders/3w/12kjnrfj441cw5csknpcw7hh0000gn/T/tmpl5qioyb3", "session_id": null}}
+{"at": "2026-09-12T22:49:10.194785+00:00", "event_type": "tool.pre", "payload": {"tool": "Bash"}}
+{"at": "2026-09-12T22:49:10.228474+00:00", "event_type": "policy.denied", "payload": {"reason": "Protected/destructive command blocked by Context OS policy.", "tool": "Bash"}}
+{"at": "2026-09-12T22:49:10.262901+00:00", "event_type": "session.started", "payload": {"cwd": "/private/var/folders/3w/12kjnrfj441cw5csknpcw7hh0000gn/T/tmpr7yui9pp", "session_id": null}}
+{"at": "2026-09-12T23:10:44.133789+00:00", "event_type": "tool.pre", "payload": {"tool": "Bash"}}
+{"at": "2026-09-12T23:10:44.163958+00:00", "event_type": "policy.denied", "payload": {"reason": "Protected/destructive command blocked by Context OS policy.", "tool": "Bash"}}
+{"at": "2026-09-12T23:10:44.194311+00:00", "event_type": "session.started", "payload": {"cwd": "/private/var/folders/3w/12kjnrfj441cw5csknpcw7hh0000gn/T/tmpq2ybmice", "session_id": null}}

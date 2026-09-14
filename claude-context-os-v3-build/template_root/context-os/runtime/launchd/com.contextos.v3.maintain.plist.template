@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+<key>Label</key><string>com.contextos.v3.maintain</string>
+<key>ProgramArguments</key><array><string>/usr/bin/python3</string><string>__CONTEXT_OS_HOME__/runtime/app/contextctl.py</string><string>maintain</string><string>--root</string><string>__CLAUDE_ROOT__</string></array>
+<key>StartInterval</key><integer>3600</integer>
+<key>RunAtLoad</key><true/>
+<key>StandardOutPath</key><string>__RUNTIME_ROOT__/maintenance.out.log</string>
+<key>StandardErrorPath</key><string>__RUNTIME_ROOT__/maintenance.err.log</string>
+</dict></plist>
