@@ -1,0 +1,88 @@
+{
+  "package_format": 1,
+  "package_name": "ProjectOS Portable Handover",
+  "created_at_utc": "2026-09-29T04:31:20Z",
+  "project": {
+    "name": "projectos",
+    "version": "0.1.0",
+    "database_schema": 3,
+    "source_commit": "e0b16e0fa1d21d7b3edcb8db4c64deeed757ee39",
+    "source_commit_date": "2026-09-28T22:31:03-06:00",
+    "source_snapshot_method": "git archive HEAD",
+    "source_file_count": 264
+  },
+  "compatibility": {
+    "python": ">=3.11",
+    "hosts": [
+      "macos",
+      "windows"
+    ],
+    "contextos_contract_version": 1,
+    "contextos_version": ">=3.0.1,<4.0.0",
+    "google_sheet_contract_version": 1
+  },
+  "authority": {
+    "system_of_record": "SQLite",
+    "collaboration_surfaces": [
+      "Google Sheets",
+      "Google Apps Script web application"
+    ],
+    "roles": {
+      "OWNER": "Full access; only role permitted to change users or view the admin menu",
+      "ADMIN": "Edit allowlisted PUBLIC project fields; no admin menu",
+      "USER": "View PUBLIC projects only; no admin menu"
+    },
+    "private_visibility": "OWNER_ONLY"
+  },
+  "artifacts": {
+    "python": {
+      "path": "ARTIFACTS/python/projectos-0.1.0-py3-none-any.whl",
+      "sha256": "5ce22520d355a9af45883f70a52b63e3334ae13daeff40fc09cedcaa07376f32",
+      "wheel_tag": "py3-none-any"
+    },
+    "gas": {
+      "Code.gs": "6b51c0ed0b7ace5ffda11896d5c7519f4b0d7d3bc89513f61ddc4dd02b88f98c",
+      "app.html": "d5444080a9e2b201198dcee1eebee156853ba391c9cb76137fab762335e98dcd",
+      "appsscript.json": "8454a274f3cfd54780746799a5bed9bc888dd54bcb0da111a5e386fe6336b91f",
+      "index.html": "e6c3732e9ae9bc9e386803619b73041d8fb66b3d7e984cbd63a0513dfd26ff3e",
+      "styles.html": "8a04b27a716c67c44e890f87e4b3cc1ba3f0f09d2ffd4ee03b075ed0f59d196b"
+    }
+  },
+  "verification": {
+    "python_interpreter": "CPython 3.14.7",
+    "python_tests": {
+      "passed": 498,
+      "failed": 0
+    },
+    "gas_tests": {
+      "passed": 28,
+      "failed": 0
+    },
+    "python_compile": "PASS",
+    "source_matches_commit_archive": true,
+    "wheel_rebuilds_byte_identical": true,
+    "gas_rebuilds_byte_identical": true,
+    "forbidden_runtime_files": 0,
+    "symlinks": 0,
+    "build_machine_identifier_findings": 0,
+    "secret_scan_note": "Secret-like strings occur only as deliberate negative-test fixtures under SOURCE/tests; no populated credential or private key is included."
+  },
+  "excluded": [
+    ".git",
+    ".superpowers",
+    ".DS_Store",
+    "__pycache__",
+    "*.pyc",
+    ".venv",
+    "build caches",
+    "populated .env or projectos.toml files",
+    "live SQLite databases and sidecars",
+    "locks, logs, journals, receipts, backups, and local runtime state",
+    "credentials, tokens, and secret values"
+  ],
+  "release_posture": {
+    "status": "LOCAL_RELEASE_CANDIDATE",
+    "host_evidence": "SIMULATED_UNTIL_SEPARATELY_AUTHORIZED",
+    "external_changes_performed": false
+  }
+}

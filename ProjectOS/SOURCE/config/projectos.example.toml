@@ -1,0 +1,10 @@
+# Copy to $PROJECTOS_HOME/projectos.toml and replace placeholders locally.
+machine_id = "CHANGE_ME_MACHINE"
+environment = "DEVELOPMENT"
+binding_id = "CHANGE_ME_BINDING_UUID"
+spreadsheet_id = "CHANGE_ME_SPREADSHEET_ID"
+expected_owner_email = "CHANGE_ME_OWNER_EMAIL"
+contract_version = 1
+credential_reference_id = "CHANGE_ME_CREDENTIAL_UUID"
+google_enabled = false
+google_write_enabled = false

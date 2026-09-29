@@ -1,0 +1,1 @@
+{"accepted":{"request_id":"10000000-0000-0000-0000-000000000001","entity_type":"project","operation":"UPDATE"},"tampered":{"same_request_id":true,"changed_payload":true},"conflict":{"base_version":0},"access":{"event_id":"20000000-0000-0000-0000-000000000001"}}

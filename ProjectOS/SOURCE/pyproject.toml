@@ -1,0 +1,28 @@
+[build-system]
+requires = []
+build-backend = "build_backend"
+backend-path = ["."]
+
+[project]
+name = "projectos"
+version = "0.1.0"
+description = "Local project catalog and Context OS enhancement"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+google = [
+  "google-api-python-client>=2,<3",
+  "google-auth>=2,<3",
+]
+
+[project.scripts]
+projectos = "projectos.cli:main"
+
+[tool.setuptools.package-data]
+projectos = [
+  "migrations/*.sql",
+  "acceptance/assets/macos/*.sh",
+  "acceptance/assets/windows/*.ps1",
+  "acceptance/assets/docs/*.md",
+]

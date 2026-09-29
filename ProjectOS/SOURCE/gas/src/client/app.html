@@ -1,0 +1,410 @@
+<script>
+(function (window, document) {
+  'use strict';
+
+  var ADMIN_ROUTES = ['Users', 'Conflicts', 'Audit', 'Settings'];
+  var ADMIN_METHODS = {Users: 'listUsers', Conflicts: 'listConflicts', Audit: 'getAuditSummary', Settings: 'getSettings'};
+  var SAFE_STATES = {
+    MAINTENANCE: {title: 'Maintenance in progress', message: 'ProjectOS is paused while its registry is checked. Try again shortly.', tone: 'warning'},
+    ACCESS_DENIED: {title: 'Access unavailable', message: 'This account does not have access to this workspace.', tone: 'danger'},
+    NOT_FOUND: {title: 'Project not found', message: 'That project is not available in the current registry view.', tone: 'warning'},
+    PENDING: {title: 'Request queued', message: 'Your change is queued for Context OS validation and sync.', tone: 'success'},
+    CONFLICT: {title: 'Review required', message: 'The project changed before this request could be applied. Refresh and try again.', tone: 'warning'},
+    REJECTED: {title: 'Request not accepted', message: 'The request did not pass validation. Review the fields and submit again.', tone: 'danger'},
+    STALE: {title: 'Analytics may be stale', message: 'The latest verified refresh is older than the current project state.', tone: 'warning'},
+    OFFLINE: {title: 'Analytics offline', message: 'The latest verified analytics are temporarily unavailable.', tone: 'danger'},
+    EMPTY: {title: 'No Looker analytics yet', message: 'No verified Looker intake has been projected for this project.', tone: 'warning'}
+  };
+
+  function buildViewModel(session) {
+    var safe = session || {};
+    return {
+      role: safe.role || 'USER',
+      showEdit: safe.canEdit === true,
+      adminRoutes: safe.role === 'OWNER' && safe.adminMenu === true ? ADMIN_ROUTES.slice() : [],
+      visibilityOptions: safe.role === 'OWNER' ? ['ALL', 'PUBLIC', 'PRIVATE'] : ['ALL', 'PUBLIC'],
+      looker: safe.looker || {view: false, edit: false, import: false, reconcile: false, cutover: false}
+    };
+  }
+
+  function stateCopy(code) {
+    var key = Object.prototype.hasOwnProperty.call(SAFE_STATES, code) ? code : 'MAINTENANCE';
+    return Object.assign({code: key}, SAFE_STATES[key]);
+  }
+
+  function adminMethod(route) { return ADMIN_METHODS[route] || null; }
+
+  function safeProject(project) {
+    var source = project || {};
+    return {
+      project_id: String(source.project_id || ''),
+      name: String(source.name || 'Untitled project'),
+      description: String(source.description || ''),
+      project_type: String(source.project_type || 'OTHER'),
+      status: String(source.status || 'UNKNOWN'),
+      visibility: source.visibility === 'PRIVATE' ? 'PRIVATE' : 'PUBLIC',
+      version: Number(source.version || 0)
+    };
+  }
+
+  function safeConnection(connection) {
+    var source = connection || {};
+    return {
+      connection_id: String(source.connection_id || ''),
+      source_project_id: source.source_project_id ? String(source.source_project_id) : null,
+      target_project_id: source.target_project_id ? String(source.target_project_id) : null,
+      connection_type: String(source.connection_type || 'RELATED'),
+      status: String(source.status || 'ACTIVE')
+    };
+  }
+
+  function safeRows(value, fields) {
+    return (Array.isArray(value) ? value : []).map(function (row) {
+      var result = {};
+      fields.forEach(function (field) { if (row && row[field] !== undefined) result[field] = row[field]; });
+      return result;
+    });
+  }
+
+  function normalizeProjectDetail(value) {
+    var source = value || {};
+    return {
+      project: safeProject(source.project || source),
+      locations: safeRows(source.locations, ['location_id', 'location_type', 'drive_folder_url', 'environment', 'status', 'machine_id', 'path', 'repository_root', 'drive_folder_id']),
+      resources: safeRows(source.resources, ['resource_id', 'resource_type', 'provider', 'name', 'url', 'environment', 'role', 'status', 'external_id']),
+      deployments: safeRows(source.deployments, ['deployment_id', 'environment', 'deployment_url', 'active_version', 'status', 'script_id', 'external_deployment_id']),
+      connections: Array.isArray(source.connections) ? source.connections.map(safeConnection) : [],
+      looker: normalizeLooker(source.looker)
+    };
+  }
+
+  function normalizeLooker(value) {
+    var source = value || {};
+    var summary = source.summary || {};
+    var graph = source.graph || {};
+    var result = {
+      state: ['READY', 'EMPTY', 'STALE', 'OFFLINE'].indexOf(source.state) >= 0 ? source.state : 'EMPTY',
+      assets: safeRows(source.assets, ['looker_asset_id', 'asset_type', 'name', 'file_path', 'version']),
+      relationships: safeRows(source.relationships, ['relationship_id', 'relationship_type', 'source_type', 'source_name', 'target_type', 'target_name']),
+      findings: safeRows(source.findings, ['finding_id', 'severity', 'code', 'subject', 'status']),
+      summary: {
+        asset_counts: summary.asset_counts || {}, dependency_counts: summary.dependency_counts || {}, finding_counts: summary.finding_counts || {},
+        git: summary.git || {}, validation: summary.validation || {}, code_status: String(summary.code_status || 'UNKNOWN'),
+        refresh_status: String(summary.refresh_status || 'UNAVAILABLE'), migration_version: Number(summary.migration_version || 0), legacy: summary.legacy || {}
+      },
+      graph: {forward: graph.forward || {}, reverse: graph.reverse || {}}
+    };
+    if (source.owner_actions) result.owner_actions = {can_import: source.owner_actions.can_import === true, can_reconcile: source.owner_actions.can_reconcile === true, can_cutover: source.owner_actions.can_cutover === true};
+    return result;
+  }
+
+  function normalizeBootstrap(data) {
+    var source = data || {};
+    var session = source.session || {};
+    var isOwner = session.role === 'OWNER';
+    var projects = Array.isArray(source.projects) ? source.projects.map(safeProject) : [];
+    if (!isOwner) projects = projects.filter(function (project) { return project.visibility === 'PUBLIC'; });
+    var visible = {};
+    projects.forEach(function (project) { visible[project.project_id] = true; });
+    var connections = Array.isArray(source.connections) ? source.connections.map(safeConnection).filter(function (connection) {
+      return (!connection.source_project_id || visible[connection.source_project_id]) &&
+        (!connection.target_project_id || visible[connection.target_project_id]);
+    }) : [];
+    return {
+      session: {role: String(session.role || 'USER'), canEdit: session.canEdit === true, adminMenu: session.adminMenu === true},
+      projects: projects,
+      connections: connections,
+      sync: {state: String((source.sync && source.sync.state) || 'UNKNOWN'), lastRun: String((source.sync && source.sync.lastRun) || '')}
+    };
+  }
+
+  function callServer(runner, name, args, onSuccess, onFailure) {
+    var chain = runner.withSuccessHandler(onSuccess).withFailureHandler(onFailure || function () {});
+    chain[name].apply(chain, args || []);
+  }
+
+  var api = {buildViewModel: buildViewModel, stateCopy: stateCopy, adminMethod: adminMethod, normalizeBootstrap: normalizeBootstrap, normalizeProjectDetail: normalizeProjectDetail, normalizeLooker: normalizeLooker, callServer: callServer};
+  window.ProjectOSClient = api;
+
+  if (!document || !document.addEventListener) return;
+  var state = {session: {}, projects: [], connections: [], sync: {}, selectedId: null, details: {}, adminData: {}};
+  var elements = {};
+
+  function byId(id) { return document.getElementById(id); }
+  function clear(node) { while (node.firstChild) node.removeChild(node.firstChild); }
+  function textElement(tag, className, text) {
+    var node = document.createElement(tag);
+    if (className) node.className = className;
+    node.textContent = text;
+    return node;
+  }
+  function showBanner(code) {
+    var copy = stateCopy(code);
+    clear(elements.banner);
+    elements.banner.dataset.tone = copy.tone;
+    elements.banner.appendChild(textElement('strong', '', copy.title));
+    elements.banner.appendChild(textElement('p', '', copy.message));
+    elements.banner.hidden = false;
+  }
+  function hideBanner() { elements.banner.hidden = true; }
+
+  function renderNav() {
+    var view = buildViewModel(state.session);
+    clear(elements.nav);
+    var routes = ['Projects'].concat(view.adminRoutes);
+    routes.forEach(function (route, index) {
+      var button = textElement('button', 'nav-item' + (index === 0 ? ' is-active' : ''), route);
+      button.type = 'button';
+      button.dataset.route = route;
+      if (index === 0) button.setAttribute('aria-current', 'page');
+      button.addEventListener('click', function () { activateRoute(route, button); });
+      elements.nav.appendChild(button);
+    });
+    elements.role.textContent = view.role;
+    clear(elements.filter);
+    view.visibilityOptions.forEach(function (value) {
+      var option = document.createElement('option');
+      option.value = value;
+      option.textContent = value === 'ALL' ? 'All visible' : (value === 'PRIVATE' ? 'Owner only' : 'Public');
+      elements.filter.appendChild(option);
+    });
+  }
+
+  function activateRoute(route, button) {
+    Array.prototype.forEach.call(elements.nav.querySelectorAll('.nav-item'), function (item) { item.classList.remove('is-active'); item.removeAttribute('aria-current'); });
+    button.classList.add('is-active'); button.setAttribute('aria-current', 'page');
+    if (route === 'Projects') {
+      elements.browser.hidden = false; renderList();
+      renderDetail(state.projects.find(function (project) { return project.project_id === state.selectedId; }) || null);
+      return;
+    }
+    elements.browser.hidden = true;
+    var method = adminMethod(route);
+    if (!method) return;
+    if (state.adminData[route] !== undefined) { renderAdmin(route, state.adminData[route]); return; }
+    if (!window.google || !window.google.script) { renderAdmin(route, []); return; }
+    callServer(window.google.script.run, method, [], function (result) {
+      if (!result || !result.ok) { showBanner((result && result.error && result.error.code) || 'ACCESS_DENIED'); return; }
+      state.adminData[route] = result.data; renderAdmin(route, result.data);
+    }, function () { showBanner('MAINTENANCE'); });
+  }
+
+  function renderAdmin(route, value) {
+    clear(elements.detail); hideBanner();
+    elements.detail.appendChild(textElement('p', 'eyebrow', 'Owner administration'));
+    var title = textElement('h2', '', route); title.id = 'detail-title'; elements.detail.appendChild(title);
+    var rows = Array.isArray(value) ? value : [value || {}];
+    if (!rows.length) { elements.detail.appendChild(textElement('p', 'detail-description', 'No records are available.')); return; }
+    rows.forEach(function (row) {
+      var card = textElement('div', 'admin-card', '');
+      Object.keys(row || {}).filter(function (key) { return !/notes|payload|secret|token/i.test(key); }).slice(0, 8).forEach(function (key) {
+        card.appendChild(datum(key.replace(/_/g, ' '), String(row[key] === null ? '—' : row[key])));
+      });
+      elements.detail.appendChild(card);
+    });
+  }
+
+  function filteredProjects() {
+    var needle = elements.search.value.trim().toLowerCase();
+    var visibility = elements.filter.value;
+    return state.projects.filter(function (project) {
+      var matchesVisibility = visibility === 'ALL' || project.visibility === visibility;
+      var haystack = [project.name, project.description, project.project_type, project.status].join(' ').toLowerCase();
+      return matchesVisibility && (!needle || haystack.indexOf(needle) >= 0);
+    });
+  }
+
+  function renderList() {
+    var projects = filteredProjects();
+    clear(elements.list);
+    elements.count.textContent = String(projects.length);
+    if (!projects.length) {
+      elements.list.appendChild(textElement('p', 'empty-list', 'No projects match this view.'));
+      renderDetail(null);
+      return;
+    }
+    projects.forEach(function (project) {
+      var button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'project-card';
+      button.setAttribute('aria-pressed', project.project_id === state.selectedId ? 'true' : 'false');
+      button.appendChild(textElement('strong', '', project.name));
+      var meta = textElement('span', 'project-meta', '');
+      [project.project_type, project.status, project.visibility].forEach(function (value) {
+        meta.appendChild(textElement('span', 'chip ' + value.toLowerCase(), value));
+      });
+      button.appendChild(meta);
+      button.addEventListener('click', function () { selectProject(project); });
+      elements.list.appendChild(button);
+    });
+    var selected = projects.find(function (project) { return project.project_id === state.selectedId; });
+    if (!selected) { selectProject(projects[0]); return; }
+  }
+
+  function selectProject(project) {
+    state.selectedId = project.project_id; renderList(); renderDetail(project);
+    if (state.details[project.project_id] || !window.google || !window.google.script) return;
+    callServer(window.google.script.run, 'getProjectDetails', [project.project_id], function (result) {
+      if (!result || !result.ok) { showBanner((result && result.error && result.error.code) || 'NOT_FOUND'); return; }
+      state.details[project.project_id] = normalizeProjectDetail(result.data); renderDetail(project);
+    }, function () { showBanner('MAINTENANCE'); });
+  }
+
+  function datum(label, value) {
+    var node = textElement('div', 'datum', '');
+    node.appendChild(textElement('span', '', label));
+    node.appendChild(textElement('strong', '', value));
+    return node;
+  }
+
+  function lookerTable(title, headings, rows) {
+    var section = textElement('section', 'looker-section', '');
+    section.appendChild(textElement('h3', '', title));
+    if (!rows.length) { section.appendChild(textElement('p', 'detail-description', 'No visible ' + title.toLowerCase() + '.')); return section; }
+    var wrap = textElement('div', 'looker-table-wrap', '');
+    var table = document.createElement('table');
+    table.appendChild(textElement('caption', 'sr-only', title));
+    var head = document.createElement('thead'); var headRow = document.createElement('tr');
+    headings.forEach(function (heading) { var cell = textElement('th', '', heading.label); cell.scope = 'col'; headRow.appendChild(cell); });
+    head.appendChild(headRow); table.appendChild(head);
+    var body = document.createElement('tbody');
+    rows.forEach(function (row) { var line = document.createElement('tr'); headings.forEach(function (heading) { line.appendChild(textElement('td', '', String(row[heading.key] === undefined ? '—' : row[heading.key]))); }); body.appendChild(line); });
+    table.appendChild(body); wrap.appendChild(table); section.appendChild(wrap); return section;
+  }
+
+  function renderOwnerReadiness(panel, looker) {
+    var section = textElement('section', 'looker-owner-panel', ''); section.appendChild(textElement('h3', '', 'Owner cutover readiness'));
+    section.appendChild(textElement('p', 'detail-description', 'Import, reconciliation, and cutover remain local Owner-authorized operations.'));
+    [['Import', looker.owner_actions.can_import], ['Reconcile', looker.owner_actions.can_reconcile], ['Prepare cutover', looker.owner_actions.can_cutover]].forEach(function (item) {
+      var row = textElement('div', 'looker-action', ''); row.appendChild(textElement('strong', '', item[0])); row.appendChild(textElement('span', '', item[1] ? 'Authorized locally' : 'Unavailable')); section.appendChild(row);
+    });
+    panel.appendChild(section);
+  }
+
+  function renderLooker(detail) {
+    var looker = detail.looker || normalizeLooker({});
+    var panel = textElement('section', 'looker-panel', ''); panel.setAttribute('aria-labelledby', 'looker-overview-title');
+    var title = textElement('h3', '', 'Looker analytics'); title.id = 'looker-overview-title'; panel.appendChild(title);
+    if (looker.state !== 'READY') {
+      var copy = stateCopy(looker.state); var status = textElement('div', 'looker-state', ''); status.setAttribute('role', 'status');
+      status.appendChild(textElement('strong', '', copy.title)); status.appendChild(textElement('p', '', copy.message)); panel.appendChild(status);
+      if (looker.state === 'EMPTY') { if (looker.owner_actions) renderOwnerReadiness(panel, looker); return panel; }
+    }
+    var counts = looker.summary.asset_counts || {};
+    var overview = textElement('div', 'looker-metrics', '');
+    Object.keys(counts).sort().forEach(function (key) { overview.appendChild(datum(key.replace(/_/g, ' '), String(counts[key]))); });
+    overview.appendChild(datum('Code status', looker.summary.code_status)); overview.appendChild(datum('Refresh', looker.summary.refresh_status)); panel.appendChild(overview);
+    var git = looker.summary.git || {}; var statusGrid = textElement('section', 'looker-status-grid', ''); statusGrid.appendChild(textElement('h3', '', 'Git and migration status'));
+    statusGrid.appendChild(datum('Branch', String(git.branch || '—'))); statusGrid.appendChild(datum('Working tree', git.dirty ? 'Changes present' : 'Clean')); statusGrid.appendChild(datum('Schema', String(looker.summary.migration_version || '—'))); panel.appendChild(statusGrid);
+    panel.appendChild(lookerTable('Dependencies', [{key: 'source', label: 'Source'}, {key: 'target', label: 'Target'}], looker.relationships.map(function (row) { return {source: row.source_type + ':' + row.source_name, target: row.target_type + ':' + row.target_name}; })));
+    panel.appendChild(lookerTable('Findings', [{key: 'severity', label: 'Severity'}, {key: 'code', label: 'Code'}, {key: 'subject', label: 'Subject'}, {key: 'status', label: 'Status'}], looker.findings));
+    var reconciliation = textElement('section', 'looker-section', ''); reconciliation.appendChild(textElement('h3', '', 'Reconciliation'));
+    reconciliation.appendChild(textElement('p', 'detail-description', 'No verified reconciliation has been projected.')); panel.appendChild(reconciliation);
+    if (looker.owner_actions) renderOwnerReadiness(panel, looker);
+    return panel;
+  }
+
+  function renderDetail(project) {
+    clear(elements.detail);
+    if (!project) {
+      var empty = textElement('div', 'empty-detail', '');
+      empty.appendChild(textElement('p', 'eyebrow', 'Project details'));
+      var heading = textElement('h2', '', 'Select a project'); heading.id = 'detail-title'; empty.appendChild(heading);
+      empty.appendChild(textElement('p', '', 'Choose a project to inspect its status and connections.'));
+      elements.detail.appendChild(empty); return;
+    }
+    var headingRow = textElement('div', 'detail-heading', '');
+    var headingText = textElement('div', '', '');
+    headingText.appendChild(textElement('p', 'eyebrow', project.visibility === 'PRIVATE' ? 'Owner workspace' : 'Shared workspace'));
+    var heading = textElement('h2', '', project.name); heading.id = 'detail-title'; headingText.appendChild(heading);
+    headingRow.appendChild(headingText);
+    if (buildViewModel(state.session).showEdit) {
+      var edit = textElement('button', 'button primary', 'Edit'); edit.type = 'button';
+      edit.addEventListener('click', function () { openEditor(project); }); headingRow.appendChild(edit);
+    }
+    elements.detail.appendChild(headingRow);
+    elements.detail.appendChild(textElement('p', 'detail-description', project.description || 'No description has been added.'));
+    var grid = textElement('div', 'detail-grid', '');
+    grid.appendChild(datum('Type', project.project_type)); grid.appendChild(datum('Status', project.status));
+    grid.appendChild(datum('Visibility', project.visibility)); grid.appendChild(datum('Version', String(project.version)));
+    elements.detail.appendChild(grid);
+    var detail = state.details[project.project_id] || normalizeProjectDetail({project: project, connections: state.connections});
+    function addCollection(title, rows, describe) {
+      var section = textElement('section', 'connections', ''); section.appendChild(textElement('h3', '', title));
+      if (!rows.length) section.appendChild(textElement('p', 'detail-description', 'No visible ' + title.toLowerCase() + '.'));
+      rows.forEach(function (item) { section.appendChild(textElement('div', 'connection-item', describe(item))); });
+      elements.detail.appendChild(section);
+    }
+    addCollection('Locations', detail.locations, function (item) { return [item.location_type, item.environment, item.drive_folder_url || item.path].filter(Boolean).join(' · '); });
+    addCollection('Resources', detail.resources, function (item) { return [item.name, item.resource_type, item.environment].filter(Boolean).join(' · '); });
+    addCollection('Deployments', detail.deployments, function (item) { return [item.environment, item.status, item.active_version].filter(Boolean).join(' · '); });
+    var related = detail.connections.filter(function (item) { return !item.source_project_id || item.source_project_id === project.project_id || item.target_project_id === project.project_id; });
+    var connections = textElement('section', 'connections', '');
+    connections.appendChild(textElement('h3', '', 'Connections'));
+    if (!related.length) connections.appendChild(textElement('p', 'detail-description', 'No visible connections.'));
+    related.forEach(function (item) { connections.appendChild(textElement('div', 'connection-item', item.connection_type + ' · ' + item.status)); });
+    elements.detail.appendChild(connections);
+    if (project.project_type === 'LOOKER' || detail.looker.assets.length || Object.keys(detail.looker.summary.asset_counts).length) elements.detail.appendChild(renderLooker(detail));
+  }
+
+  function openEditor(project) {
+    byId('edit-project-id').value = project.project_id; byId('edit-version').value = String(project.version);
+    byId('edit-name').value = project.name; byId('edit-description').value = project.description;
+    byId('edit-error').textContent = '';
+    if (elements.dialog.showModal) elements.dialog.showModal(); else elements.dialog.setAttribute('open', '');
+    byId('edit-name').focus();
+  }
+  function closeEditor() { if (elements.dialog.close) elements.dialog.close(); else elements.dialog.removeAttribute('open'); }
+
+  function submitEditor(event) {
+    event.preventDefault();
+    var name = byId('edit-name').value.trim();
+    if (!name) { byId('edit-error').textContent = 'Enter a project name.'; return; }
+    var payload = {entity_type: 'project', entity_id: byId('edit-project-id').value, operation: 'UPDATE', base_version: Number(byId('edit-version').value), changes: {name: name, description: byId('edit-description').value.trim()}};
+    if (!window.google || !window.google.script) { closeEditor(); showBanner('PENDING'); return; }
+    callServer(window.google.script.run, 'submitChangeRequest', [payload], function (result) {
+      closeEditor(); showBanner(result && result.ok ? 'PENDING' : ((result && result.error && result.error.code) || 'REJECTED'));
+    }, function () { byId('edit-error').textContent = 'The request could not be submitted. Try again.'; });
+  }
+
+  function applyBootstrap(data) {
+    state = Object.assign(state, normalizeBootstrap(data));
+    var raw = data || {};
+    state.adminData = raw.adminData || {};
+    (raw.details ? Object.keys(raw.details) : []).forEach(function (key) { state.details[key] = normalizeProjectDetail(raw.details[key]); });
+    elements.sync.textContent = state.sync.state === 'HEALTHY' ? 'Synced' : state.sync.state;
+    renderNav(); renderList();
+  }
+
+  function envelopeData(result, fallback) {
+    if (!result || result.ok !== true) throw new Error((result && result.error && result.error.code) || 'MAINTENANCE');
+    return result.data === undefined ? fallback : result.data;
+  }
+
+  function loadLive() {
+    callServer(window.google.script.run, 'getSession', [], function (sessionResult) {
+      var session;
+      try { session = envelopeData(sessionResult, {}); } catch (error) { showBanner(error.message); return; }
+      var pending = {session: session, projects: [], connections: [], sync: {state: 'UNKNOWN'}};
+      var remaining = 3;
+      function done() { remaining -= 1; if (!remaining) applyBootstrap(pending); }
+      function failed() { showBanner('MAINTENANCE'); }
+      callServer(window.google.script.run, 'listProjects', [], function (result) { try { pending.projects = envelopeData(result, []); done(); } catch (error) { failed(); } }, failed);
+      callServer(window.google.script.run, 'listConnections', [], function (result) { try { pending.connections = envelopeData(result, []); done(); } catch (error) { failed(); } }, failed);
+      callServer(window.google.script.run, 'getSyncStatus', [], function (result) { try { var sync = envelopeData(result, {}); pending.sync = {state: sync.environment || 'READY', lastRun: ''}; done(); } catch (error) { failed(); } }, failed);
+    }, function () { showBanner('ACCESS_DENIED'); });
+  }
+
+  function initialize() {
+    elements = {nav: byId('primary-nav'), banner: byId('state-banner'), role: byId('role-badge'), sync: byId('sync-summary'), search: byId('project-search'), filter: byId('project-filter'), list: byId('project-list'), count: byId('project-count'), detail: byId('project-detail'), browser: document.querySelector('.project-browser'), dialog: byId('edit-dialog')};
+    elements.list.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
+    elements.search.addEventListener('input', renderList); elements.filter.addEventListener('change', renderList);
+    byId('edit-close').addEventListener('click', closeEditor); byId('edit-cancel').addEventListener('click', closeEditor); byId('edit-form').addEventListener('submit', submitEditor);
+    if (window.__PROJECTOS_FIXTURE__) { hideBanner(); applyBootstrap(window.__PROJECTOS_FIXTURE__); }
+    else if (window.google && window.google.script && window.google.script.run) loadLive();
+    else showBanner('MAINTENANCE');
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initialize); else initialize();
+}(window, document));
+</script>

@@ -1,0 +1,28 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+build/
+dist/
+gas/dist/
+
+# ProjectOS local runtime state
+*.db
+*.db-wal
+*.db-shm
+*.manifest.json
+backups/
+*.debug.log
+diagnostics/
+*.diagnostics.json
+*.sync.lock
+
+# Machine-local Google and Apps Script configuration
+projectos.toml
+.clasp.json
+.clasprc.json
+credentials.json
+token.json
+
+# Local supervised-development evidence
+.superpowers/

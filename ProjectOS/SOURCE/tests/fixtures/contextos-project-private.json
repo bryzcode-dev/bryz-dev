@@ -1,0 +1,10 @@
+{
+  "project_id": "private-ops",
+  "name": "Private Operations",
+  "slug": "private-ops",
+  "path": "/opt/private-ops",
+  "project_type": "MIXED",
+  "visibility": "PRIVATE",
+  "types": ["private"],
+  "resources": []
+}

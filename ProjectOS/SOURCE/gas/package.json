@@ -1,0 +1,1 @@
+{"name":"projectos-gas","private":true,"version":"0.1.0","scripts":{"build":"node scripts/build.mjs","test":"node --test test/*.test.js"}}

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>ProjectOS</title>
+  <?!= include('styles'); ?>
+</head>
+<body>
+  <a class="skip-link" href="#workspace">Skip to workspace</a>
+  <header class="topbar">
+    <a class="brand" href="#workspace" aria-label="ProjectOS home">
+      <span class="brand-mark" aria-hidden="true">P</span>
+      <span><strong>ProjectOS</strong><small>Context OS registry</small></span>
+    </a>
+    <div class="topbar-status">
+      <span class="status-dot" aria-hidden="true"></span>
+      <span id="sync-summary">Connecting</span>
+      <span id="role-badge" class="role-badge">—</span>
+    </div>
+  </header>
+
+  <nav id="primary-nav" class="primary-nav" aria-label="Primary navigation">
+    <button type="button" class="nav-item is-active" data-route="Projects" aria-current="page">Projects</button>
+  </nav>
+
+  <div id="state-banner" class="state-banner" role="status" aria-live="polite" hidden></div>
+
+  <main id="workspace" class="workspace" tabindex="-1">
+    <section class="project-browser" aria-labelledby="projects-title">
+      <div class="section-heading">
+        <div><p class="eyebrow">Registry</p><h1 id="projects-title">Projects</h1></div>
+        <span id="project-count" class="count-badge">0</span>
+      </div>
+      <div class="controls">
+        <div class="field search-field">
+          <label for="project-search">Search projects</label>
+          <input id="project-search" type="search" placeholder="Name, type, or status" autocomplete="off">
+        </div>
+        <div class="field filter-field">
+          <label for="project-filter">Visibility</label>
+          <select id="project-filter"><option value="ALL">All visible</option><option value="PUBLIC">Public</option><option value="PRIVATE">Owner only</option></select>
+        </div>
+      </div>
+      <div id="project-list" class="project-list" aria-live="polite"></div>
+    </section>
+
+    <aside id="project-detail" class="project-detail" aria-labelledby="detail-title">
+      <div class="empty-detail"><p class="eyebrow">Project details</p><h2 id="detail-title">Select a project</h2><p>Choose a project to inspect its status and connections.</p></div>
+      <section id="looker-overview" class="looker-panel" aria-labelledby="looker-overview-title" hidden><h2 id="looker-overview-title">Looker analytics</h2></section>
+    </aside>
+  </main>
+
+  <footer><span>SQLite is the system of record</span><span id="footer-version">ProjectOS</span></footer>
+
+  <dialog id="edit-dialog" aria-labelledby="edit-title">
+    <form id="edit-form" method="dialog" aria-describedby="edit-help edit-error">
+      <div class="dialog-heading"><div><p class="eyebrow">Change request</p><h2 id="edit-title">Edit project</h2></div><button id="edit-close" class="icon-button" type="button" aria-label="Close edit dialog">×</button></div>
+      <p id="edit-help">Edits are submitted to SQLite for validation before the Sheet projection changes.</p>
+      <input id="edit-project-id" type="hidden">
+      <input id="edit-version" type="hidden">
+      <div class="field"><label for="edit-name">Project name</label><input id="edit-name" name="name" required maxlength="120"></div>
+      <div class="field"><label for="edit-description">Description</label><textarea id="edit-description" name="description" rows="4" maxlength="1000"></textarea></div>
+      <p id="edit-error" class="form-error" role="alert"></p>
+      <div class="dialog-actions"><button id="edit-cancel" class="button secondary" type="button">Cancel</button><button class="button primary" type="submit">Submit request</button></div>
+    </form>
+  </dialog>
+
+  <?!= include('app'); ?>
+</body>
+</html>
