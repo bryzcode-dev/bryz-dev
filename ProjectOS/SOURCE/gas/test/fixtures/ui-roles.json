@@ -1,0 +1,44 @@
+{
+  "owner": {
+    "session": {"role": "OWNER", "canEdit": true, "adminMenu": true, "looker": {"view": true, "edit": true, "import": true, "reconcile": true, "cutover": true}},
+    "projects": [
+      {"project_id": "public-1", "name": "Fleet Analytics", "description": "Public Looker project", "project_type": "LOOKER", "status": "ACTIVE", "visibility": "PUBLIC", "version": 4},
+      {"project_id": "private-1", "name": "Private Operations", "description": "Owner-only local project", "project_type": "LOCAL", "status": "ACTIVE", "visibility": "PRIVATE", "version": 2}
+    ],
+    "connections": [{"connection_id": "edge-1", "source_project_id": "public-1", "target_project_id": "public-1", "connection_type": "READS"}],
+    "details": {
+      "public-1": {
+        "project": {"project_id": "public-1", "name": "Fleet Analytics", "description": "Public Looker project", "project_type": "LOOKER", "status": "ACTIVE", "visibility": "PUBLIC", "version": 4},
+        "locations": [{"location_id": "loc-1", "location_type": "DRIVE", "drive_folder_url": "https://drive.example.invalid/fleet", "environment": "PRODUCTION", "status": "ACTIVE"}],
+        "resources": [{"resource_id": "res-1", "name": "Master Sheet", "resource_type": "SHEET", "provider": "GOOGLE", "environment": "PRODUCTION", "status": "ACTIVE"}],
+        "deployments": [{"deployment_id": "dep-1", "environment": "PRODUCTION", "status": "ACTIVE", "active_version": "12"}],
+        "connections": [{"connection_id": "edge-1", "source_project_id": "public-1", "target_project_id": "public-1", "connection_type": "READS", "status": "ACTIVE"}],
+        "looker": {
+          "state": "READY",
+          "assets": [{"looker_asset_id": "asset-1", "asset_type": "view", "name": "orders", "file_path": "orders.view.lkml", "version": 1}],
+          "relationships": [{"relationship_id": "relationship-1", "relationship_type": "explore_view", "source_type": "explore", "source_name": "orders", "target_type": "view", "target_name": "orders"}],
+          "findings": [{"finding_id": "finding-1", "severity": "WARNING", "code": "UNRESOLVED_REFERENCE", "subject": "view:missing", "status": "OPEN"}],
+          "summary": {"asset_counts": {"view": 1, "explore": 1}, "git": {"branch": "main", "dirty": false}, "code_status": "PASS", "refresh_status": "UNAVAILABLE", "migration_version": 3},
+          "graph": {"forward": {"explore:orders": ["view:orders"]}, "reverse": {"view:orders": ["explore:orders"]}},
+          "owner_actions": {"can_import": true, "can_reconcile": true, "can_cutover": true}
+        }
+      }
+    },
+    "adminData": {"Users": [{"display_name": "Owner", "role": "OWNER", "active": true}, {"display_name": "Admin", "role": "ADMIN", "active": true}], "Conflicts": [], "Audit": [{"event_type": "project.updated", "created_at": "2026-09-26T12:00:00Z"}], "Settings": {"environment": "FIXTURE", "contractVersion": 1}},
+    "sync": {"state": "HEALTHY", "lastRun": "2026-09-26T12:00:00Z"}
+  },
+  "admin": {
+    "session": {"role": "ADMIN", "canEdit": true, "adminMenu": false, "looker": {"view": true, "edit": true, "import": false, "reconcile": false, "cutover": false}},
+    "projects": [{"project_id": "public-1", "name": "Fleet Analytics", "description": "Public Looker project", "project_type": "LOOKER", "status": "ACTIVE", "visibility": "PUBLIC", "version": 4}],
+    "connections": [],
+    "details": {"public-1": {"project": {"project_id": "public-1", "name": "Fleet Analytics", "description": "Public Looker project", "project_type": "LOOKER", "status": "ACTIVE", "visibility": "PUBLIC", "version": 4}, "locations": [], "resources": [], "deployments": [], "connections": [], "looker": {"state": "STALE", "assets": [{"looker_asset_id": "asset-1", "asset_type": "view", "name": "orders", "file_path": "orders.view.lkml", "version": 1}], "relationships": [], "findings": [], "summary": {"asset_counts": {"view": 1}, "git": {"branch": "main", "dirty": false}, "code_status": "PASS", "refresh_status": "STALE", "migration_version": 3}, "graph": {"forward": {}, "reverse": {}}}}},
+    "sync": {"state": "HEALTHY", "lastRun": "2026-09-26T12:00:00Z"}
+  },
+  "user": {
+    "session": {"role": "USER", "canEdit": false, "adminMenu": false, "looker": {"view": true, "edit": false, "import": false, "reconcile": false, "cutover": false}},
+    "projects": [{"project_id": "public-1", "name": "Fleet Analytics", "description": "Public Looker project", "project_type": "LOOKER", "status": "ACTIVE", "visibility": "PUBLIC", "version": 4}],
+    "connections": [],
+    "details": {"public-1": {"project": {"project_id": "public-1", "name": "Fleet Analytics", "description": "Public Looker project", "project_type": "LOOKER", "status": "ACTIVE", "visibility": "PUBLIC", "version": 4}, "locations": [], "resources": [], "deployments": [], "connections": [], "looker": {"state": "EMPTY", "assets": [], "relationships": [], "findings": [], "summary": {}, "graph": {"forward": {}, "reverse": {}}}}},
+    "sync": {"state": "HEALTHY", "lastRun": "2026-09-26T12:00:00Z"}
+  }
+}

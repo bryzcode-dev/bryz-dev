@@ -1,0 +1,1 @@
+{"server":["src/server/00_Namespace.js","src/server/10_Config.js","src/server/20_Contract.js","src/server/30_Auth.js","src/server/40_DataService.js","src/server/50_RequestService.js","src/server/60_AdminService.js","src/server/70_Menu.js","src/server/90_Entry.js"],"client":["src/client/index.html","src/client/styles.html","src/client/app.html"]}

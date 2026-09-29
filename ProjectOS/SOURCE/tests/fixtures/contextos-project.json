@@ -1,0 +1,18 @@
+{
+  "project_id": "context-os-v3",
+  "name": "Context OS V3",
+  "slug": "context-os-v3",
+  "path": "/opt/context-os",
+  "project_type": "LOCAL",
+  "visibility": "PUBLIC",
+  "types": ["context-os", "automation"],
+  "resources": [
+    {
+      "resource_type": "GOOGLE_SHEET",
+      "provider": "GOOGLE",
+      "external_id": "sheet-123",
+      "name": "Context OS Operations",
+      "url": "https://docs.google.com/spreadsheets/d/sheet-123"
+    }
+  ]
+}
